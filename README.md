@@ -9,7 +9,7 @@ This solution helps you quickly build a fully-feature, easy-to-manage, and highl
 - Vendors who run online stores that serve customers directly
 **Solution Architecture**
 ---------------
-![Architecture](./document/building-a-magento-e-commerce-website.png)
+![Architecture](./document/building-a-Magento-e-commerce-website.png)
 
 **Architecture Description**
 ---------------
