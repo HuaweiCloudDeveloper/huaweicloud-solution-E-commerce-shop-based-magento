@@ -1,11 +1,11 @@
-﻿#!/bin/bash
+#!/bin/bash
 DOMAIN_URL=$1
 DB_HOST_IP=$2
 DB_NAME=$3
 DB_USER=$4
-DB_PASSWORD=$5
+DB_PW=$5
 MAGENTO_ADMIN_USER=$6
-MAGENTO_ADMIN_PASSWORD=$7
+MAGENTO_ADMIN_PW=$7
 MAGENTO_ADMIN_EMAIL=$8
 MAGENTO_ADMIN_FIRSTNAME=$9
 MAGENTO_ADMIN_LASTNAME=$10
@@ -63,13 +63,13 @@ systemctl restart nginx
 --db-host="${DB_HOST_IP}" \
 --db-name="${DB_NAME}" \
 --db-user="${DB_USER}" \
---db-password="${DB_PASSWORD}" \
+--db-password="${DB_PW}" \
 --use-rewrites=1 \
 --use-secure=0 \
 --base-url="http://${DOMAIN_URL}" \
 --base-url-secure="https://${DOMAIN_URL}" \
 --admin-user="${MAGENTO_ADMIN_USER}" \
---admin-password="${MAGENTO_ADMIN_PASSWORD}" \
+--admin-password="${MAGENTO_ADMIN_PW}" \
 --admin-email="${MAGENTO_ADMIN_EMAIL}" \
 --admin-firstname="${MAGENTO_ADMIN_FIRSTNAME}" \
 --admin-lastname="${MAGENTO_ADMIN_LASTNAME}" \
