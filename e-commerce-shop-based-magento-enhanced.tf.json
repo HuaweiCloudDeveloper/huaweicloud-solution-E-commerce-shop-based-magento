@@ -1,0 +1,408 @@
+{
+    "terraform": {
+        "required_providers": [
+            {
+                "huaweicloud": {
+                    "source": "huawei.com/provider/huaweicloud",
+                    "version": ">=1.42.0"
+                }
+            }
+        ]
+    },
+    "provider": {
+        "huaweicloud": {
+            "cloud": "myhuaweicloud.com",
+            "endpoints": {
+                "iam": "iam.ap-southeast-3.myhuaweicloud.com",
+                "dns": "dns.ap-southeast-3.myhuaweicloud.com",
+                "bss": "bss.myhuaweicloud.com"
+            },
+            "insecure": true,
+            "region": "ap-southeast-3",
+            "auth_url": "https://iam.ap-southeast-3.myhuaweicloud.com/v3"
+        }
+    },
+    "variable": {
+        "vpc_name": {
+            "default": "e_commerce_shop_based_magento_enhanced_demo",
+            "description": "Specifies the VPC name used to create a new VPC. The VPC name must be unique. The name can contain 1 to 57 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is e_commerce_shop_based_magento_enhanced_demo.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,57}$\",var.vpc_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "secgroup_name": {
+            "default": "e_commerce_shop_based_magento_enhanced_demo",
+            "description": "Specifies the name of the new security group. For details about how to configure a security group rule, see the deployment guide. The name can contain 1 to 55 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is e_commerce_shop_based_magento_enhanced_demo.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[\\\\w\\\\.-]{1,64}$\",var.secgroup_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "rds_name": {
+            "default": "e_commerce_shop_based_magento_enhanced_demo",
+            "description": "Specifies the RDS database name, which must be unique. The name can contain 1 to 64 characters, including letters, digits, underscores (_), hyphens (-), and periods (.). The default name is e_commerce_shop_based_magento_enhanced_demo.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[a-zA-Z0-9_\\\\.-]{1,64}$\",var.rds_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "rds_flavor_id": {
+            "default": "rds.mysql.n1.2xlarge.4.ha",
+            "description": "Specifies the RDS instance flavor. The default value is rds.mysql.n1.2xlarge.4.ha (8U16G). Refer to the deployment guide for other flavors.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^rds\\\\.mysql\\\\.(n|x)1\\\\.([248]|16){0,1}(large|xlarge)\\\\.[248](\\\\.(ha|rr)){0,1}$\",var.rds_flavor_id))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "rds_admin_pass": {
+            "default": "",
+            "description": "Specifies the initial password of the RDS database. Log in to the RDS console to change the password by following the instructions provided in deployment guide. The password can contain 8 to 32 characters, which must include at least three types of uppercase letters, lowercase letters, digits, or the following special characters (!@$%^-_=+[{}]:,./?). The administrator username is root.",
+            "type": "string",
+            "nullable": false,
+            "sensitive": true
+        },
+        "ecs_name": {
+            "default": "e_commerce_shop_based_magento_enhanced_demo",
+            "description": "Specifies the ECS name, which must be unique. The name can contain 0 to 54 characters, including letters, digits, underscores (_), hyphens (-), and periods (.) The default name is e_commerce_shop_based_magento_enhanced_demo.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[a-zA-Z0-9_\\\\.-]{1,54}$\",var.ecs_name))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "ecs_flavor_id": {
+            "default": "s6.xlarge.2",
+            "description": "Specifies the ECS flavor. The default value is s6.xlarge.2 (4U8G). Refer to the deployment guide for other flavors.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^([a-z][a-z0-9]{0,3}\\\\.)(small\\\\.|medium\\\\.|(x||[1-9][0-9]{0,1}x)large\\\\.)[1-9][0-9]{0,1}$\",var.ecs_flavor_id))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "ecs_password": {
+            "default": "",
+            "description": "Specifies the initial password of the ECS. Log in to the ECS console to change the password by following the instructions provided in deployment guide. The password can contain 8 to 26 characters, which must include at least three types of uppercase letters, lowercase letters, digits, or the following special characters (!@$%^-_=+[{}]:,./?). The password cannot contain the username or the username spelled backwards. The administrator username is root.",
+            "type": "string",
+            "nullable": false,
+            "sensitive": true
+        },
+        "magento_admin_user": {
+            "default": "admin",
+            "description": "Specifies the username of the Magento administrator. The name can contain 1 to 40 characters, including letters, digits, underscores (_), hyphens (-), and periods (.)",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[a-zA-Z0-9_\\\\.-]{1,40}$\",var.magento_admin_user))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "magento_admin_passwd": {
+            "default": "",
+            "description": "Specifies the password of the Magento administrator. The password can contain 8 to 32 characters, which must include at least three types of uppercase letters, lowercase letters, digits, or the following special characters (!@$%^-_=+[{}]:,./?).",
+            "type": "string",
+            "nullable": false,
+            "sensitive": true
+        },
+        "magento_admin_email": {
+            "default": "",
+            "description": "Specifies the email address used by the Magento administrator.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[\\\\da-z]+([\\\\-\\\\._]?[\\\\da-z]+)*@[\\\\da-z]+([\\\\-\\\\.]?[\\\\da-z]+)*(\\\\.[a-z]{2,3})+$\",var.magento_admin_email))>0}",
+                "error_message": "Invalid input. Please re-enter."
+            }
+        },
+        "charging_mode": {
+            "default": "prePaid",
+            "description": "Specifies the billing mode of ECS, RDS, and EIP. The mode can be prePaid or postPaid. The default billing mode is prePaid.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${contains([\"postPaid\",\"prePaid\"], var.charging_mode)}",
+                "error_message": "Invalid input, please re-enter."
+            }
+        },
+        "period_unit": {
+            "default": "month",
+            "description": "Specifies the subscription period type of the ECS, RDS, and EIP. This parameter is valid only when charging_mode is set to prePaid. The value can be month (default) or year.",
+            "type": "string",
+            "nullable": false,
+            "validation": {
+                "condition": "${contains([\"month\",\"year\"], var.period_unit)}",
+                "error_message": "Invalid input, please re-enter."
+            }
+        },
+        "period": {
+            "default": 1,
+            "description": "Specifies the subscription period of the ECS, RDS, and EIP. This parameter is valid only when charging_mode is set to charging_mode. If period_unit is set to month, the value ranges from 1 to 9. If period_unit is set to year, the value ranges from 1 to 3. The default value is 1 month.",
+            "type": "number",
+            "nullable": false,
+            "validation": {
+                "condition": "${length(regexall(\"^[1-9]$\",var.period))>0}",
+                "error_message": "Invalid input, please re-enter."
+            }
+        }
+    },
+    "data": {
+        "huaweicloud_availability_zones": {
+            "az": {}
+        },
+        "huaweicloud_images_image": {
+            "image": {
+                "most_recent": true,
+                "name": "Ubuntu 18.04 server 64bit",
+                "visibility": "public"
+            }
+        }
+    },
+    "resource": {
+        "huaweicloud_vpc": {
+            "vpc": {
+                "cidr": "172.16.0.0/16",
+                "name": "${var.vpc_name}_vpc"
+            }
+        },
+        "huaweicloud_vpc_subnet": {
+            "subnet": {
+                "cidr": "172.16.10.0/24",
+                "gateway_ip": "172.16.10.1",
+                "name": "${var.vpc_name}_subnet",
+                "vpc_id": "${huaweicloud_vpc.vpc.id}",
+                "primary_dns": "100.125.1.250"
+            }
+        },
+        "huaweicloud_networking_secgroup": {
+            "secgroup": {
+                "name": "${var.secgroup_name}_secgroup"
+            }
+        },
+        "huaweicloud_networking_secgroup_rule": {
+            "allow_http": {
+                "description": "Allows accesses to websites over HTTP.",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "ports": "80",
+                "protocol": "tcp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.secgroup.id}"
+            },
+            "allow_https": {
+                "description": "Allows accesses to websites over HTTPS.",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "ports": "443",
+                "protocol": "tcp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.secgroup.id}"
+            },
+            "allow_ping": {
+                "description": "Allows ping operations to test ECS connectivity.",
+                "direction": "ingress",
+                "ethertype": "IPv4",
+                "protocol": "icmp",
+                "remote_ip_prefix": "0.0.0.0/0",
+                "security_group_id": "${huaweicloud_networking_secgroup.secgroup.id}"
+            }
+        },
+        "huaweicloud_rds_instance": {
+            "rds": {
+                "availability_zone": [
+                    "${data.huaweicloud_availability_zones.az.names[0]}",
+                    "${data.huaweicloud_availability_zones.az.names[2]}"
+                ],
+                "backup_strategy": {
+                    "keep_days": 1,
+                    "start_time": "02:00-03:00"
+                },
+                "count": 1,
+                "db": {
+                    "password": "${var.rds_admin_pass}",
+                    "type": "MySQL",
+                    "version": "5.7"
+                },
+                "flavor": "${var.rds_flavor_id}",
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.period_unit}",
+                "period": "${var.period}",
+                "auto_pay": true,
+                "ha_replication_mode": "async",
+                "name": "${var.rds_name}",
+                "security_group_id": "${huaweicloud_networking_secgroup.secgroup.id}",
+                "subnet_id": "${huaweicloud_vpc_subnet.subnet.id}",
+                "volume": {
+                    "size": 80,
+                    "type": "CLOUDSSD"
+                },
+                "vpc_id": "${huaweicloud_vpc.vpc.id}"
+            }
+        },
+        "huaweicloud_rds_database": {
+            "database": {
+                "instance_id": "${huaweicloud_rds_instance.rds[0].id}",
+                "name": "magento_db2",
+                "character_set": "utf8"
+            }
+        },
+        "huaweicloud_compute_instance": {
+            "ecs0": {
+                "availability_zone": "${data.huaweicloud_availability_zones.az.names[3]}",
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.period_unit}",
+                "period": "${var.period}",
+                "auto_pay": true,
+                "flavor_id": "${var.ecs_flavor_id}",
+                "image_id": "${data.huaweicloud_images_image.image.id}",
+                "name": "${var.ecs_name}_0001",
+                "admin_pass": "${var.ecs_password}",
+                "network": {
+                    "uuid": "${huaweicloud_vpc_subnet.subnet.id}"
+                },
+                "security_group_ids": [
+                    "${huaweicloud_networking_secgroup.secgroup.id}"
+                ],
+                "system_disk_size": 40,
+                "system_disk_type": "SSD",
+                "user_data": "#! /bin/sh\necho 'root:${var.ecs_password}'| chpasswd > /dev/null 2>&1\nwget https://documentation-samples-4.obs.ap-southeast-3.myhuaweicloud.com/solution-as-code-moudle/e-commerce-shop-based-magento/userdata/install_magento01.sh -O /tmp/install_magento01.sh\nsh  /tmp/install_magento01.sh '${huaweicloud_vpc_eip.eip.address}' '${huaweicloud_rds_instance.rds[0].private_ips[0]}' 'magento_db2' 'root' '${var.rds_admin_pass}' '${var.magento_admin_user}' '${var.magento_admin_passwd}' '${var.magento_admin_email}' 'magento' 'demo' > /tmp/install_magento01.log\nrm -f /tmp/install_magento01.sh"
+            },
+            "ecs1": {
+                "availability_zone": "${data.huaweicloud_availability_zones.az.names[0]}",
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.period_unit}",
+                "period": "${var.period}",
+                "auto_pay": true,
+                "flavor_id": "${var.ecs_flavor_id}",
+                "image_id": "${data.huaweicloud_images_image.image.id}",
+                "name": "${var.ecs_name}_0002",
+                "admin_pass": "${var.ecs_password}",
+                "network": {
+                    "uuid": "${huaweicloud_vpc_subnet.subnet.id}"
+                },
+                "security_group_ids": [
+                    "${huaweicloud_networking_secgroup.secgroup.id}"
+                ],
+                "system_disk_size": 40,
+                "system_disk_type": "SSD",
+                "user_data": "#! /bin/sh\necho 'root:${var.ecs_password}'| chpasswd > /dev/null 2>&1\nwget https://documentation-samples-4.obs.ap-southeast-3.myhuaweicloud.com/solution-as-code-moudle/e-commerce-shop-based-magento/userdata/install_magento02.sh -O /tmp/install_magento02.sh\nsh  /tmp/install_magento02.sh '${huaweicloud_vpc_eip.eip.address}' '${huaweicloud_rds_instance.rds[0].private_ips[0]}' 'magento_db2' 'root' '${var.rds_admin_pass}' '${var.magento_admin_user}' '${var.magento_admin_passwd}' '${var.magento_admin_email}' 'magento' 'demo' > /tmp/install_magento02.log\nrm -f /tmp/install_magento02.sh"
+            }
+        },
+        "huaweicloud_vpc_eip": {
+            "eip": {
+                "bandwidth": [
+                    {
+                        "charge_mode": "bandwidth",
+                        "name": "${var.ecs_name}-eip",
+                        "share_type": "PER",
+                        "size": 20
+                    }
+                ],
+                "charging_mode": "${var.charging_mode}",
+                "period_unit": "${var.period_unit}",
+                "period": "${var.period}",
+                "auto_pay": true,
+                "publicip": [
+                    {
+                        "type": "5_bgp"
+                    }
+                ]
+            },
+            "eip_ecs": {
+                "count": 2,
+                "bandwidth": [
+                    {
+                        "charge_mode": "traffic",
+                        "name": "${var.ecs_name}-eip_ecs",
+                        "share_type": "PER",
+                        "size": 10
+                    }
+                ],
+                "charging_mode": "postPaid",
+                "publicip": [
+                    {
+                        "type": "5_bgp"
+                    }
+                ]
+            }
+        },
+        "huaweicloud_compute_eip_associate": {
+            "associated0": {
+                "instance_id": "${huaweicloud_compute_instance.ecs0.id}",
+                "public_ip": "${huaweicloud_vpc_eip.eip_ecs[0].address}"
+            },
+            "associated1": {
+                "instance_id": "${huaweicloud_compute_instance.ecs1.id}",
+                "public_ip": "${huaweicloud_vpc_eip.eip_ecs[1].address}"
+            }
+        },
+        "huaweicloud_lb_loadbalancer": {
+            "elb": {
+                "name": "${var.ecs_name}-elb",
+                "vip_subnet_id": "${huaweicloud_vpc_subnet.subnet.subnet_id}"
+            }
+        },
+        "huaweicloud_lb_listener": {
+            "listener_http": {
+                "loadbalancer_id": "${huaweicloud_lb_loadbalancer.elb.id}",
+                "protocol": "HTTP",
+                "protocol_port": 80
+            }
+        },
+        "huaweicloud_lb_monitor": {
+            "monitor_http": {
+                "delay": 5,
+                "max_retries": 3,
+                "pool_id": "${huaweicloud_lb_pool.pool_http.id}",
+                "timeout": 3,
+                "type": "HTTP",
+                "url_path": "/",
+                "expected_codes": "200-202"
+            }
+        },
+        "huaweicloud_lb_pool": {
+            "pool_http": {
+                "lb_method": "ROUND_ROBIN",
+                "listener_id": "${huaweicloud_lb_listener.listener_http.id}",
+                "name": "group_http",
+                "protocol": "HTTP"
+            }
+        },
+        "huaweicloud_lb_member": {
+            "member_http0": {
+                "address": "${huaweicloud_compute_instance.ecs0.access_ip_v4}",
+                "pool_id": "${huaweicloud_lb_pool.pool_http.id}",
+                "protocol_port": 80,
+                "subnet_id": "${huaweicloud_vpc_subnet.subnet.subnet_id}",
+                "weight": 1
+            },
+            "member_http1": {
+                "address": "${huaweicloud_compute_instance.ecs1.access_ip_v4}",
+                "pool_id": "${huaweicloud_lb_pool.pool_http.id}",
+                "protocol_port": 80,
+                "subnet_id": "${huaweicloud_vpc_subnet.subnet.subnet_id}",
+                "weight": 1
+            }
+        },
+        "huaweicloud_networking_eip_associate": {
+            "eip": {
+                "port_id": "${huaweicloud_lb_loadbalancer.elb.vip_port_id}",
+                "public_ip": "${huaweicloud_vpc_eip.eip.address}"
+            }
+        }
+    },
+    "output": {
+        "Logging_in_to_Magento": {
+            "value": "After the deployment is complete, the script are executed. You can log in to the ECS to view the script execution progress in /tmp/install_magento.log. After about 35 minutes, you can visit the e-commerce website at http://${huaweicloud_vpc_eip.eip.address}/."
+        }
+    }
+}
